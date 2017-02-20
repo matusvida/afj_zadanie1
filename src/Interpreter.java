@@ -45,69 +45,72 @@ public class Interpreter {
                     read(arrayInput, arrayOutput, pointer, inputPointer);
                     inputPointer++;
                     index++;
-                }
-                break;
+                }break;
 
                 case Instructions.WRITE: {
                     write(arrayOutput, pointer);
                     index++;
-                }
-                break;
+                }break;
 
                 case Instructions.MOVE_LEFT: {
                     pointer = decPointer(pointer);
                     index++;
-                }
-                break;
+                }break;
 
                 case Instructions.MOVE_RIGHT: {
                     pointer = incPointer(pointer);
                     index++;
-                }
-                break;
+                }break;
 
                 case Instructions.NULLABLE: {
                     setToNull(arrayOutput, pointer);
                     index++;
-                }
-                break;
+                }break;
 
                 case Instructions.INCREMENT: {
                     increment(arrayOutput, pointer);
                     index++;
-                }
-                break;
+                }break;
 
                 case Instructions.DECREMENT: {
                     decrement(arrayOutput, pointer);
                     index++;
-                }
-                break;
+                }break;
 
-//                case Instructions.: {
-//                    inverse(arrayOutput, pointer);
-//                    index++;
-//                }
-//                break;
+                case Instructions.DEC_PLUS:{
+                    decPlus(arrayOutput, index, pointer);
+                    index++;
+                }break;
+
+                case Instructions.DEC_MINUS:{
+                    decMinus(arrayOutput, index, pointer);
+                    index++;
+                }break;
+
+                case Instructions.TO_START:{
+                    pointer = toStart();
+                    index++;
+                }break;
 
                 case Instructions.START_CYCLE: {
                     beginLoopIndex = index;
                     index++;
-                }
-                break;
+                }break;
 
                 case Instructions.END_CYCLE: {
                     endLoopIndex = index;
                     index = stopLoop(arrayOutput, beginLoopIndex, endLoopIndex, pointer);
-                }
-                break;
+                }break;
+
+                case Instructions.NOP:{
+                    index++;
+                }break;
 
                 default: {
                     System.out.println("Nepodporovany znak " + listSource.get(index) + " na " + (index + 1) + ". mieste");
                     syntaxError = true;
                     index++;
-                }
-                break;
+                }break;
             }
         }
 
@@ -118,7 +121,7 @@ public class Interpreter {
     }
 
     private static void write(byte[] arrayOutput, int pointer){
-        System.out.println((char)(arrayOutput[pointer]&0xff));
+        System.out.print((char)(arrayOutput[pointer]&0xff));
     }
 
     private static void increment(byte[] arrayOutput, int pointer){
@@ -160,6 +163,20 @@ public class Interpreter {
             pointer--;
         }
         return pointer;
+    }
+
+    private void decPlus(byte[] arrayOutput, int index, int pointer){
+        int value = Integer.parseInt(listSource.get(index+1), 2);
+        arrayOutput[pointer] = (byte) (arrayOutput[pointer] + value);
+    }
+
+    private void decMinus(byte[] arrayOutput, int index, int pointer){
+        int value = Integer.parseInt(listSource.get(index+1), 2);
+        arrayOutput[pointer] = (byte) (arrayOutput[pointer] - value);
+    }
+
+    private int toStart(){
+        return 0;
     }
 
     private static void inverse(byte[] arrayOutput, int pointer){
