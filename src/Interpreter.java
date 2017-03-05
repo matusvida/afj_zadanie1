@@ -3,6 +3,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by Matus on 22.02.2016.
@@ -13,7 +14,7 @@ public class Interpreter {
     private String inputName;
     private String outputName;
     private byte[] arrayInput = new byte[100000];
-    private byte[] arraySource;// = new byte[][(int) source.length()];
+    private byte[] arraySource;
     private byte[] arrayOutput = new byte[100000];
     private List<String> listSource;
 
@@ -36,6 +37,7 @@ public class Interpreter {
         int inputPointer = 0;
         int index = 0; //index, ktorym sa iteruje pole
         int beginLoopIndex = 0;
+        Stack<Integer> beginLoopIndexList = new Stack<Integer>();
         int endLoopIndex = 0;
         boolean syntaxError = false;
 
@@ -93,13 +95,16 @@ public class Interpreter {
                 }break;
 
                 case Instructions.START_CYCLE: {
-                    beginLoopIndex = index;
+//                    beginLoopIndex = index;
+                    beginLoopIndexList.push(index);
                     index++;
                 }break;
 
                 case Instructions.END_CYCLE: {
                     endLoopIndex = index;
-                    index = stopLoop(arrayOutput, beginLoopIndex, endLoopIndex, pointer);
+                    index = stopLoop(arrayOutput, beginLoopIndexList, endLoopIndex, pointer);
+                    beginLoopIndexList.pop();
+
                 }break;
 
                 case Instructions.NOP:{
@@ -192,11 +197,11 @@ public class Interpreter {
 
     }
 
-    private static int stopLoop(byte[] arrayOutput,int beginLoopIndex, int endLoopIndex, int pointer){
+    private static int stopLoop(byte[] arrayOutput,Stack beginLoopIndexList, int endLoopIndex, int pointer){
         if(arrayOutput[pointer] == 0x00){
             return endLoopIndex + 1;
         }
-        return beginLoopIndex;
+        return (Integer) beginLoopIndexList.get(beginLoopIndexList.size()-1);
     }
 
     private List<String> initListSource(byte[] array){
